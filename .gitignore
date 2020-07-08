@@ -1,0 +1,23 @@
+# OS Files #
+#############
+
+.DS_Store
+.DS_Store?
+
+# Config #
+##########
+**/ssl
+src/config/auth.json
+src/config/twitter.json
+src/config/role_ids.json
+
+containers/nginx/conf/ssl/
+
+containers/database/dbdata
+containers/database/environment_vars.txt
+src/config/config.ini
+
+
+logs/node 
+logs/nginx
+
