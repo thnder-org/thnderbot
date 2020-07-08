@@ -29,6 +29,7 @@ class TwitterHelper{
         // res[0] is the first element
     }
 
+    // Pulls in your latest tweet
     async getLatestTweet(){
         let url = `https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=${this.username}`
         let headers = {'Authorization': `Bearer ${auth.twitter.bearertoken}`}
