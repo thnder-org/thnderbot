@@ -1,6 +1,7 @@
 {
     "cron":true,
     "cron_schedule":"*/5 * * * * *",
+    "auto_post_channel_id":"1",
     "username":"your_username_no@",
     "last_tweet_id":null
 }

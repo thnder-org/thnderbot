@@ -13,16 +13,16 @@ class DiscordHelper {
         this.client = null
     }
 
-    start(){
+    async start(){
         const client = new Discord.Client()
         this.client = client
         const commandHelper = new CommandHelper(client)
 
-        client.on('ready', () => {
+        await client.on('ready', async () => {
             console.log(`Logged in as ${client.user.tag}!`)
         })
 
-        client.on('message', async (msg) => {
+        await client.on('message', async (msg) => {
             var canAdmin = await this.canAdmin(msg)
 
             var commandPayload = await commandHelper.parseMessage(msg, canAdmin)
@@ -31,7 +31,8 @@ class DiscordHelper {
             }
         })
 
-        client.login(auth.token)
+        await client.login(auth.token)
+        return client
     }
 
     async sendResponse(msg, commandPayload){
