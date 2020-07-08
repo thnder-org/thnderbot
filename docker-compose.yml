@@ -1,0 +1,12 @@
+version: '3.2'
+services:
+    node:
+        container_name: discord_node
+        build:
+            context: ./containers/node
+            dockerfile: Dockerfile
+        restart: always
+        volumes:
+            - ./src:/app
+            - ./logs/node:/node-log
+            - ./src/config:/app/config

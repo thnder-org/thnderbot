@@ -1,0 +1,6 @@
+{
+    "cron":true,
+    "cron_schedule":"*/5 * * * * *",
+    "username":"your_username_no@",
+    "last_tweet_id":null
+}

@@ -1,0 +1,10 @@
+{
+    "token": "token",
+    "twitter": {
+        "apikey": "apikey",
+        "apikeysecret": "apikeysecret",
+        "bearertoken": "bearertoken",
+        "accesstoken": "accesstoken",
+        "accesstokensecret": "accesstokensecret"
+    }
+}

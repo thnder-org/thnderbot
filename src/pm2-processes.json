@@ -1,0 +1,14 @@
+{
+    "apps" : [
+        {
+            "name"       : "api",
+            "script"     : "apiServer.js",
+            "instances"  : 1,
+            "exec_mode"  : "cluster_mode",
+            "ignore_watch" : ["/app/config" ],
+            "watch": ["apiServer.js", "helpers", "package.json"],
+            "log_date_format" : "YYYY-MM-DD HH:mm Z"
+        }
+
+    ]
+}

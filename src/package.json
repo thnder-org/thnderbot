@@ -1,0 +1,15 @@
+{
+  "name": "Thnderbot",
+  "version": "1.0.0",
+  "description": "The Discord bot for the Thnder gaming community.",
+  "main": "apiServer.js",
+  "author": "Thnder",
+  "scripts": {
+    "start": "node apiServer.js"
+  },
+  "dependencies": {
+    "axios": "^0.19.2",
+    "cron": "^1.8.2",
+    "discord.js": "^12.2.0"
+  }
+}
