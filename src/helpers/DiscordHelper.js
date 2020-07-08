@@ -32,6 +32,7 @@ class DiscordHelper {
         })
 
         await client.login(auth.token)
+        
         return client
     }
 
