@@ -48,9 +48,11 @@ class DnDHelper{
                 rolls.push(roll)
                 total += roll
             }
-            let response = `You rolled a ${total}+${plusNumber}=${total+plusNumber} (${rolls.join(", ")})`
+            if(plusNumber == 0)
+                return `You rolled a ${total} (${rolls.join(", ")})`
+            else
+                return `You rolled a ${total}+${plusNumber}=${total+plusNumber} (${rolls.join(", ")})`
 
-            return response
         } else{
             number = number[1]
             return `You rolled a ${this.getRandomInt(parseInt(number))}.`

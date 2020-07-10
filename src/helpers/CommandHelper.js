@@ -33,8 +33,13 @@ class CommandHelper{
                 role: "all"
             },
             {
-                command: "!rollstats",
+                command: "!rollstat",
                 text: "Rolls 4d6 and takes the highest 3, Example: !rollstats",
+                role: "all"
+            },
+            {
+                command: "!rollallstat",
+                text: "Rolls 6 stats for building a character. Rolls 4d6 and takes the highest 3, Example: !rollallstats",
                 role: "all"
             },
             {
