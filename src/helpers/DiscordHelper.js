@@ -40,58 +40,74 @@ class DiscordHelper {
         switch(commandPayload.target){
             case "user":
                 // Sending a message to a channel responding to the user
-                if(commandPayload.private)
+                if(commandPayload.private){
+                    let dm = await this.replyInDM(msg, commandPayload)
+                    return dm
+                } else{
                     return this.replyInChannel(msg, commandPayload)
-                else
-                    return this.replyInChannel(msg, commandPayload)
+                }
             case "channel":
                  // Sending a message to a channel as the bot
                 this.sendToChannel(commandPayload.channel_id, commandPayload.response)
                 break;
             // Responsing in a DM to the user
-            default:
+            // default:
         }
     }
  
-    replyInChannel(msg, commandPayload){
+    async replyInChannel(msg, commandPayload){
         if(commandPayload.response == null)
             return msg.reply("You must provide a message!")
         else
-            return msg.reply(commandPayload.response);
+            try{
+                let message = await msg.reply(commandPayload.response)
+                if(commandPayload.reactions != null)
+                    this.react(message, commandPayload.reactions)
+                return ;
+            }catch(e){
+                console.log(e)
+            }
+            
     }
 
-    replyInDM(msg, commandPayload){
+    react(msg, reactions){
+        reactions.forEach(reaction => {
+            msg.react(reaction)
+        });
+    }
+
+    async replyInDM(msg, commandPayload){
         if(commandPayload.response == null)
-            return msg.reply("You must provide a message!")
+            await msg.author.send("You must provide a message!")
         else
-            return msg.reply(commandPayload.response);
+            await msg.author.send(commandPayload.response);
+    
+        msg.delete()
+        return 
     }
-
-
-
 
     async sendToChannel(channelID, message){
         let channel = await this.client.channels.fetch(channelID)
             .then(channel => {return channel})
             .catch(console.error);
-        return channel.send(message)
-    }
-
-    async sendPicToChannel(channelID, message, picURL){
-        let channel = await this.client.channels.fetch(channelID)
-            .then(channel => {return channel})
-            .catch(console.error);
-        
-        return channel.send(message, {files: [picURL]})
+        try{
+            return channel.send(message)
+        }catch(e){
+            console.log(e)
+        }
+      
     }
 
     async canAdmin(msg){
-        let isAdmin = await msg.member.roles.cache.find(role => role.id === role_ids.admin)
-        let isMod = await msg.member.roles.cache.find(role => role.id === role_ids.moderator)
-        let isOwner = await msg.member.roles.cache.find(role => role.id === role_ids.owner)
-
-        let isAdminOrModOrOwner = isAdmin || isMod || isOwner
-        return isAdminOrModOrOwner
+        if(msg.channel.type != "dm"){
+            let isAdmin = await msg.member.roles.cache.find(role => role.id === role_ids.admin)
+            let isMod = await msg.member.roles.cache.find(role => role.id === role_ids.moderator)
+            let isOwner = await msg.member.roles.cache.find(role => role.id === role_ids.owner)
+    
+            let isAdminOrModOrOwner = isAdmin || isMod || isOwner
+            return isAdminOrModOrOwner
+        }else
+            return true
     }
 
     

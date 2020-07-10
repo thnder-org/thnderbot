@@ -1,3 +1,4 @@
+var DnDHelper = require("./DnDHelper.js")
 const Discord = require('discord.js')
 
 class CommandHelper{
@@ -27,6 +28,21 @@ class CommandHelper{
                 role: "all"
             },
             {
+                command: "!roll",
+                text: "Roll a dice equal to the number requested, Example: !roll d20",
+                role: "all"
+            },
+            {
+                command: "!rollstats",
+                text: "Rolls 4d6 and takes the highest 3, Example: !rollstats",
+                role: "all"
+            },
+            {
+                command: "!report",
+                text: "This is currently being written. Submits a server report via the bot. The report is anonymous unless you include your name and that you would like to be contacted. Please include details like which channel the incident occurred at and at what time.",
+                role: "all"
+            },
+            {
                 command: "!commands",
                 text: "You're looking at it!",
                 role: "all"
@@ -36,7 +52,6 @@ class CommandHelper{
     }
 
 
-
     async parseMessage(msg, canAdmin){
         var payload = {
             isCommand: false
@@ -44,7 +59,10 @@ class CommandHelper{
 
         if(msg.content.startsWith("!")){
             var command = msg.content.split(" ")[0]
+            payload.isCommand = true
+            payload.command = command
             switch(command){
+
                 //Admin Functions
                 case "!messagechannel":
                 case "!messagechannelwithimage":
@@ -53,30 +71,90 @@ class CommandHelper{
                         payload.response = "You must be an admin to message channels via the bot."
                         return payload
                     }
-                    return this.messageChannel(msg)
+                    payload.target = "channel"
+                    payload.private = false
+                    return this.messageChannel(msg, payload)
 
                 // Non admin functions
+                // public responses
                 case "!ping":
-                    return this.pong(msg)
-                case "!points":
-                    return this.points(msg)
+                    payload.target = "user"
+                    payload.private = false
+                    return this.pong(msg, payload)
+                case "!prayforavon":
+                    payload.target = "user"
+                    payload.private = false
+                    return this.prayForAvon(msg, payload)
+                case "!rollforhotness":
+                    payload.target = "user"
+                    payload.private = false
+                    return this.rollForHotness(msg, payload)
+                case "!roll":
+                    payload.target = "user"
+                    payload.private = false
+                    return this.roll(msg, payload)
+                case "!rollstat":
+                    payload.target = "user"
+                    payload.private = false
+                    return this.rollStats(msg, payload)
+                case "!rollallstats":
+                    payload.target = "user"
+                    payload.private = false
+                    return this.rollAllStats(msg, payload)
                 case "!help":
                 case "!commands":
-                    return this.getcommands(msg, canAdmin)
+                    payload.target = "user"
+                    payload.private = false
+                    return this.getcommands(msg, canAdmin, payload)
+
+                // private responses
+                case "!points":
+                    payload.target = "user"
+                    payload.private = true
+                    return this.points(msg, payload)
+                case "!report":
+                    payload.target = "user"
+                    payload.private = true
+                    return this.report(msg, payload)
             }
         }
         return payload
     }
 
-    getcommands(msg, canAdmin){
-        let payload = {}
+    rollForHotness(msg, payload){
+        let hotness = DnDHelper.rollForHotness()
+        payload.response = `They rolled a ${hotness.hotness}/10. ${hotness.text}`
+        payload.reactions = hotness.reactions
+        return payload
+    }
 
-        payload.isCommand = true
-        payload.target = "user"
-        payload.private = false
-        payload.command = "!commands"
+    prayForAvon(msg, payload){
+        payload.response = DnDHelper.prayForAvon()
+        payload.reactions = ["🙏"]
+        return payload
+    }
 
-                    
+    roll(msg, payload){     
+        payload.response = DnDHelper.roll(msg.content)
+        return payload
+    }
+
+    rollAllStats(msg, payload){     
+        payload.response = DnDHelper.rollAllStats()
+        return payload
+    }
+
+    rollStats(msg, payload){     
+        payload.response = DnDHelper.rollStats()
+        return payload
+    }
+
+    report(msg, payload){
+        payload.response = msg.content.replace("!report").trim()
+        return payload
+    }
+
+    getcommands(msg, canAdmin, payload){
         let embedFields = this.commands.map((element) => {
             if(canAdmin){
                return {name: element.command, value: element.text}
@@ -85,9 +163,7 @@ class CommandHelper{
                     return {name: element.command, value: element.text}
                 }
             }
-
         })
-        console.log(embedFields)
 
         let embed = new Discord.MessageEmbed({
             fields: embedFields
@@ -99,45 +175,21 @@ class CommandHelper{
             .setThumbnail('https://thnder.com/images/brand_icon.png')
             .setTimestamp()
 
-        // this.commands.forEach(element => {
-        //     embed.addField(element)
-        // })
-            
-        console.log(embed)
-
         payload.response = embed
-
         return payload
     }
 
-    pong(msg){
-        let payload = {}
-
-        payload.isCommand = true
-        payload.target = "user"
+    pong(msg, payload){
         payload.response = "!pong"
-        payload.private = false
-        payload.command = "!ping"
-
         return payload
     }
 
-    points(msg){
-        let payload = {}
-
-        payload.isCommand = true
-        payload.target = "user"
-        payload.private = true
+    points(msg, payload){
         payload.response = "under construction"
-        payload.command = "!points"
-
         return payload
     }
 
-    messageChannel(msg){
-        let payload = {}
-        payload.isCommand = true
-
+    messageChannel(msg, payload){
         // Split and process out messages
         let channelMessage = msg.content.replace("!messagechannelwithimage ", "", 1).replace("!messagechannel ", "", 1).trim()
         let splitMessage = channelMessage.split(" ")
@@ -149,23 +201,21 @@ class CommandHelper{
             return payload
         }
 
-        payload.target = "channel"
         payload.channel_id = splitMessage[0].replace("<#", "", 1).replace(">", "", 1).trim()
         payload.response = channelMessage.replace(`<#${payload.channel_id}>`, "", 1).trim()
         if(msg.content.includes("!messagechannelwithimage")){
-            payload.command = "!commands"
             if(channelMessage.includes("url=")){
-                payload.url = channelMessage.split("url=")[1]
+                payload.response = new Discord.MessageAttachment(channelMessage.split("url=")[1])
             }else{
                 payload.target = "user"
                 payload.response = "You send a proper url formate. eg. url=https://yourface.com"
                 return payload
             }
         }else{
-            payload.command = "!messagechannel"
+            if(payload.response.length == 0)
+                payload.response = "\u200b\n"
         }
         
-            
         return payload
     }
 }
