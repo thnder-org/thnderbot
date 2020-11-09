@@ -86,8 +86,8 @@ class DiscordHelper {
         return 
     }
 
-    async sendToChannel(channelID, message){
-        let channel = await this.client.channels.fetch(channelID)
+    sendToChannel(channelID, message){
+        let channel = this.client.channels.fetch(channelID)
             .then(channel => {return channel})
             .catch(console.error);
         try{
