@@ -1,4 +1,5 @@
 var DnDHelper = require("./DnDHelper.js")
+var NewWorldHelper = require("./NewWorldHelper.js")
 const Discord = require('discord.js')
 
 class CommandHelper{
@@ -76,46 +77,31 @@ class CommandHelper{
                         payload.response = "You must be an admin to message channels via the bot."
                         return payload
                     }
-                    payload.target = "channel"
-                    payload.private = false
                     return this.messageChannel(msg, payload)
 
                 // Non admin functions
                 // public responses
                 case "!ping":
-                    payload.target = "user"
-                    payload.private = false
                     return this.pong(msg, payload)
                 case "!prayforavon":
-                    payload.target = "user"
-                    payload.private = false
                     return this.prayForAvon(msg, payload)
                 case "!rollforhotness":
-                    payload.target = "user"
-                    payload.private = false
                     return this.rollForHotness(msg, payload)
                 case "!roll":
-                    payload.target = "user"
-                    payload.private = false
                     return this.roll(msg, payload)
                 case "!rollstat":
-                    payload.target = "user"
-                    payload.private = false
                     return this.rollStats(msg, payload)
                 case "!rollallstats":
-                    payload.target = "user"
-                    payload.private = false
                     return this.rollAllStats(msg, payload)
+                case "!nw":
+                    payload.target = "user"
+                    return this.newWorld(msg, payload)
                 case "!help":
                 case "!commands":
-                    payload.target = "user"
-                    payload.private = false
                     return this.getcommands(msg, canAdmin, payload)
 
                 // private responses
                 case "!points":
-                    payload.target = "user"
-                    payload.private = true
                     return this.points(msg, payload)
                 case "!report":
                     payload.target = "user"
@@ -126,7 +112,15 @@ class CommandHelper{
         return payload
     }
 
+    newWorld(msg, payload){
+        payload = NewWorldHelper.parseMessage(msg.content, payload)
+        return payload
+    }
+
     rollForHotness(msg, payload){
+        payload.target = "user"
+        payload.private = false
+
         let hotness = DnDHelper.rollForHotness()
         payload.response = `They rolled a ${hotness.hotness}/10. ${hotness.text}`
         payload.reactions = hotness.reactions
@@ -134,22 +128,34 @@ class CommandHelper{
     }
 
     prayForAvon(msg, payload){
+        payload.target = "user"
+        payload.private = false
+
         payload.response = DnDHelper.prayForAvon()
         payload.reactions = ["🙏"]
         return payload
     }
 
-    roll(msg, payload){     
+    roll(msg, payload){  
+        payload.target = "user"
+        payload.private = false
+
         payload.response = DnDHelper.roll(msg.content)
         return payload
     }
 
-    rollAllStats(msg, payload){     
+    rollAllStats(msg, payload){  
+        payload.target = "user"
+        payload.private = false
+          
         payload.response = DnDHelper.rollAllStats()
         return payload
     }
 
     rollStats(msg, payload){     
+        payload.target = "user"
+        payload.private = false
+
         payload.response = DnDHelper.rollStats()
         return payload
     }
@@ -160,6 +166,10 @@ class CommandHelper{
     }
 
     getcommands(msg, canAdmin, payload){
+        payload.target = "user"
+        payload.private = false
+
+
         let embedFields = this.commands.map((element) => {
             if(canAdmin){
                return {name: element.command, value: element.text}
@@ -185,16 +195,25 @@ class CommandHelper{
     }
 
     pong(msg, payload){
+        payload.target = "user"
+        payload.private = false
+
         payload.response = "!pong"
         return payload
     }
 
     points(msg, payload){
+        payload.target = "user"
+        payload.private = true
+        
         payload.response = "under construction"
         return payload
     }
 
     messageChannel(msg, payload){
+        payload.target = "channel"
+        payload.private = false
+
         // Split and process out messages
         let channelMessage = msg.content.replace("!messagechannelwithimage ", "", 1).replace("!messagechannel ", "", 1).trim()
         let splitMessage = channelMessage.split(" ")
